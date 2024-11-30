@@ -1,6 +1,6 @@
 <template>
   <div>
-    <h2>Component A</h2>
+    <h2 class="text-3xl font-bold underline">Component A</h2>
     <p>This is Component A</p>
   </div>
 </template>
