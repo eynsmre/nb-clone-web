@@ -7,53 +7,34 @@
       <!-- Yeniler Menüsü -->
       <li 
         class="menu-item category-item" 
-        @mouseover="toggleDropdown('yeniler', true)" 
-        @mouseleave="toggleDropdown('yeniler', false)"
+
       >
         <a href="#">Yeniler</a>
-        <Category 
-          :isOpen="menuStates.yeniler"
-          :class="{ 'is-visible': menuStates.yeniler }"
-        />
+        
       </li>
       
       <!-- Erkek Menüsü -->
       <li 
         class="menu-item category-item" 
-        @mouseover="toggleDropdown('erkek', true)" 
-        @mouseleave="toggleDropdown('erkek', false)"
+
       >
         <a href="#">Erkek</a>
-        <Category 
-          :isOpen="menuStates.erkek"
-          :class="{ 'is-visible': menuStates.erkek }"
-        />
+        
       </li>
 
       <!-- Kadın Menüsü -->
       <li 
         class="menu-item category-item" 
-        @mouseover="toggleDropdown('kadin', true)" 
-        @mouseleave="toggleDropdown('kadin', false)"
       >
         <a href="#">Kadın</a>
-        <Category 
-          :isOpen="menuStates.kadin"
-          :class="{ 'is-visible': menuStates.kadin }"
-        />
       </li>
 
       <!-- Çocuk Menüsü -->
       <li 
         class="menu-item category-item" 
-        @mouseover="toggleDropdown('cocuk', true)" 
-        @mouseleave="toggleDropdown('cocuk', false)"
       >
         <a href="#">Çocuk</a>
-        <Category 
-          :isOpen="menuStates.cocuk"
-          :class="{ 'is-visible': menuStates.cocuk }"
-        />
+        
       </li>
       
       <li><a href="#" class="discount">İndirim</a></li>
@@ -68,7 +49,7 @@
           <i class="fas fa-search"></i>
         </button>
       </div>
-      <SearchDropdown
+      <ComponentB
         :isOpen="menuStates.search"
         @close="toggleDropdown('search', false)"
         :class="{ 'is-visible': menuStates.search }"
