@@ -1,19 +1,16 @@
 <template>
   <div class="carousel-container overflow-hidden relative">
-
     <div
       class="carousel flex transition-transform duration-500 ease-in-out"
       :style="{ transform: `translateX(-${currentSlide * slideWidth}px)` }"
       ref="carousel"
     >
-
       <div
         v-for="(item, index) in items"
         :key="index"
         class="carousel-item w-1/4 p-2 flex-shrink-0"
       >
         <div class="border rounded-lg overflow-hidden group relative">
-
           <img
             :src="item.image"
             :alt="item.title"
@@ -39,7 +36,6 @@
             </svg>
           </button>
 
-
           <div
             class="absolute bottom-2 left-0 right-0 bg-gray-50 bg-opacity-50 text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           >
@@ -61,26 +57,28 @@
       </div>
     </div>
 
-
     <button
+      v-if="currentSlide > 0"
       class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2"
       @click="prevSlide"
     >
       ‹
     </button>
+
     <button
+      v-if="currentSlide < items.length - visibleSlides"
       class="absolute right-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2"
       @click="nextSlide"
     >
       ›
     </button>
-  </div>
 
-  <View
-    v-if="showComponent"
-    :product="selectedProduct"
-    @close="showComponent = false"
-  />
+    <View
+      v-if="showComponent"
+      :product="selectedProduct"
+      @close="showComponent = false"
+    />
+  </div>
 </template>
 
 <script>
@@ -91,58 +89,50 @@ export default {
       selectedProduct: null,
       currentSlide: 0,
       slideWidth: 0,
+      visibleSlides: 4,
       items: [
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBWNV3432-SST_1.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBWNV3432-SST_1.jpg",
           title: "New Balance WNV3432 Beyaz Kadın Mont & Yelek",
           price: "3.999,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBWNJ3435-BK_1.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBWNJ3435-BK_1.jpg",
           title: "New Balance WNJ3435 Siyah Kadın Mont & Yelek",
           price: "5.299,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBUNJ3436-TPG_1.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBUNJ3436-TPG_1.jpg",
           title: "New Balance MNJ3436 Yeşil Erkek Mont & Yelek",
           price: "6.299,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-GRY_3.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-GRY_3.jpg",
           title: "New Balance MNP1403 Gri Eşofman Altı",
           price: "1.686,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
           title: "New Balance MNP1403 Gri Eşofman Altı",
           price: "1.686,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
           title: "New Balance MNP1403 Gri Eşofman Altı",
           price: "1.686,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
           title: "New Balance MNP1403 Gri Eşofman Altı",
           price: "1.686,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
           title: "New Balance MNP1403 Gri Eşofman Altı",
           price: "1.686,00 ₺",
         },
         {
-          image:
-            "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
+          image: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBMNP1403-BKW_3.jpg",
           title: "New Balance MNP1403 Gri Eşofman Altı",
           price: "1.686,00 ₺",
         },
@@ -161,7 +151,6 @@ export default {
       this.selectedProduct = item;
       this.showComponent = true;
     },
-
     calculateSlideWidth() {
       const carousel = this.$refs.carousel;
       if (carousel && carousel.children.length > 0) {
@@ -169,7 +158,7 @@ export default {
       }
     },
     nextSlide() {
-      if (this.currentSlide < this.items.length - 4) {
+      if (this.currentSlide < this.items.length - this.visibleSlides) {
         this.currentSlide++;
       }
     },
