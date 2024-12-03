@@ -16,10 +16,10 @@
       <ComponentC v-if="currentComponent === 'ComponentC'" />
       <ComponentD v-if="currentComponent === 'ComponentD'" />
       <ComponentE v-if="currentComponent === 'ComponentE'" />
-      <ComponentF v-if="currentComponent === 'ComponentF'" />
-      <ComponentH v-if="currentComponent === 'ComponentH'" />
-      <ComponentI v-if="currentComponent === 'ComponentI'" />
-      <ComponentJ v-if="currentComponent === 'ComponentJ'" />
+      <ProductCarousel v-if="currentComponent === 'ProductCarousel'" />
+      <ProductCard v-if="currentComponent === 'ProductCard'" />
+      <TheFooter v-if="currentComponent === 'TheFooter'"/>
+      <Carousel v-if="currentComponent === 'Carousel'" />
     </div>
   </div>
 </template>
@@ -29,10 +29,10 @@ import ComponentA from "~/components/ComponentA.vue";
 import ComponentC from "~/components/ComponentC.vue";
 import ComponentD from "~/components/ComponentD.vue";
 import ComponentE from "~/components/ComponentE.vue";
-import ComponentF from "~/components/ComponentF.vue";
-import ComponentH from "~/components/ComponentH.vue";
-import ComponentI from "~/components/ComponentI.vue";
-import ComponentJ from "~/components/ComponentJ.vue";
+import ProductCarousel from "~/components/ProductCarousel.vue";
+import ProductCard from "~/components/ProductCard.vue";
+import TheFooter from "~/components/TheFooter.vue";
+import Carousel from "~/components/Carousel.vue";
 
 export default {
   components: {
@@ -40,23 +40,23 @@ export default {
     ComponentC,
     ComponentD,
     ComponentE,
-    ComponentF,
-    ComponentH,
-    ComponentI,
-    ComponentJ,
+    ProductCarousel,
+    ProductCard,
+    TheFooter,
+    Carousel,
   },
   data() {
     return {
       currentComponent: "",
       components: [
-        { name: "ComponentA", label: "Buton1" },
-        { name: "ComponentC", label: "Buton3" },
-        { name: "ComponentD", label: "Buton4" },
-        { name: "ComponentE", label: "Buton5" },
-        { name: "ComponentF", label: "Buton6" },
-        { name: "ComponentH", label: "Buton8" },
-        { name: "ComponentI", label: "Buton9" },
-        { name: "ComponentJ", label: "Buton10" },
+        { name: "ComponentA", label: "Component 1-2" },
+        { name: "ComponentC", label: "Component 3" },
+        { name: "ComponentD", label: "Component 4" },
+        { name: "ComponentE", label: "Component 5" },
+        { name: "Carousel", label: "Component 6" },
+        { name: "ProductCard", label: "Component 7" },
+        { name: "ProductCarousel", label: "Component 8-9" },
+        { name: "TheFooter", label: "Component 10" },
       ],
     };
   },
@@ -69,7 +69,6 @@ export default {
 </script>
 
 <style scoped>
-/* İsteğinize göre stil ekleyebilirsiniz */
 button {
   margin: 5px;
 }

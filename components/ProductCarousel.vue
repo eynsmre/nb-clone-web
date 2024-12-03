@@ -1,25 +1,25 @@
 <template>
   <div class="carousel-container overflow-hidden relative">
-    <!-- Carousel Items -->
+
     <div
       class="carousel flex transition-transform duration-500 ease-in-out"
       :style="{ transform: `translateX(-${currentSlide * slideWidth}px)` }"
       ref="carousel"
     >
-      <!-- Each individual item -->
+
       <div
         v-for="(item, index) in items"
         :key="index"
         class="carousel-item w-1/4 p-2 flex-shrink-0"
       >
         <div class="border rounded-lg overflow-hidden group relative">
-          <!-- Product Image -->
+
           <img
             :src="item.image"
             :alt="item.title"
             class="object-cover w-full h-64"
           />
-          <!-- Heart Icon (only appears on hover) -->
+
           <button
             class="absolute top-2 right-2 bg-white p-1 rounded-full shadow hover:scale-110 transition-transform opacity-0 group-hover:opacity-100"
           >
@@ -39,7 +39,7 @@
             </svg>
           </button>
 
-          <!-- Hover Overlay (only appears on hover) -->
+
           <div
             class="absolute bottom-2 left-0 right-0 bg-gray-50 bg-opacity-50 text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
           >
@@ -51,7 +51,7 @@
             </button>
           </div>
         </div>
-        <!-- Product Details (always visible) -->
+
         <div class="p-4 text-left bg-white">
           <span class="text-orange-500 text-sm font-bold">Yeni</span>
           <h3 class="text-sm font-bold">{{ item.title }}</h3>
@@ -61,7 +61,7 @@
       </div>
     </div>
 
-    <!-- Controls -->
+
     <button
       class="absolute left-0 top-1/2 transform -translate-y-1/2 bg-black bg-opacity-50 text-white p-2"
       @click="prevSlide"
@@ -90,7 +90,7 @@ export default {
       showComponent: false,
       selectedProduct: null,
       currentSlide: 0,
-      slideWidth: 0, // The width of each slide (calculated dynamically)
+      slideWidth: 0,
       items: [
         {
           image:
@@ -158,25 +158,22 @@ export default {
   },
   methods: {
     openQuickView(item) {
-      this.selectedProduct = item; // Seçilen ürünü kaydet
-      this.showComponent = true; // Modal'ı aç
+      this.selectedProduct = item;
+      this.showComponent = true;
     },
 
     calculateSlideWidth() {
-      // Dynamically calculate the width of each slide (one item)
       const carousel = this.$refs.carousel;
       if (carousel && carousel.children.length > 0) {
         this.slideWidth = carousel.children[0].offsetWidth;
       }
     },
     nextSlide() {
-      // Move to the next slide; if at the end, loop back to the start
       if (this.currentSlide < this.items.length - 4) {
         this.currentSlide++;
       }
     },
     prevSlide() {
-      // Move to the previous slide; if at the beginning, loop to the last
       if (this.currentSlide > 0) {
         this.currentSlide--;
       }
@@ -198,6 +195,6 @@ export default {
   object-fit: cover;
 }
 .carousel-item {
-  background-color: transparent; /* Make the background transparent */
+  background-color: transparent;
 }
 </style>
