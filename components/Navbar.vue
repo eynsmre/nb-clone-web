@@ -7,34 +7,53 @@
       <!-- Yeniler Menüsü -->
       <li 
         class="menu-item category-item" 
-
+        @mouseover="toggleDropdown('yeniler', true)" 
+        @mouseleave="toggleDropdown('yeniler', false)"
       >
         <a href="#">Yeniler</a>
-        
+        <Category 
+          :isOpen="menuStates.yeniler"
+          :class="{ 'is-visible': menuStates.yeniler }"
+        />
       </li>
       
       <!-- Erkek Menüsü -->
       <li 
         class="menu-item category-item" 
-
+        @mouseover="toggleDropdown('erkek', true)" 
+        @mouseleave="toggleDropdown('erkek', false)"
       >
         <a href="#">Erkek</a>
-        
+        <Category 
+          :isOpen="menuStates.erkek"
+          :class="{ 'is-visible': menuStates.erkek }"
+        />
       </li>
 
       <!-- Kadın Menüsü -->
       <li 
         class="menu-item category-item" 
+        @mouseover="toggleDropdown('kadin', true)" 
+        @mouseleave="toggleDropdown('kadin', false)"
       >
         <a href="#">Kadın</a>
+        <Category 
+          :isOpen="menuStates.kadin"
+          :class="{ 'is-visible': menuStates.kadin }"
+        />
       </li>
 
       <!-- Çocuk Menüsü -->
       <li 
         class="menu-item category-item" 
+        @mouseover="toggleDropdown('cocuk', true)" 
+        @mouseleave="toggleDropdown('cocuk', false)"
       >
         <a href="#">Çocuk</a>
-        
+        <Category 
+          :isOpen="menuStates.cocuk"
+          :class="{ 'is-visible': menuStates.cocuk }"
+        />
       </li>
       
       <li><a href="#" class="discount">İndirim</a></li>
@@ -49,7 +68,7 @@
           <i class="fas fa-search"></i>
         </button>
       </div>
-      <ComponentB
+      <SearchDropdown
         :isOpen="menuStates.search"
         @close="toggleDropdown('search', false)"
         :class="{ 'is-visible': menuStates.search }"
@@ -62,20 +81,31 @@
           <img src="/static/images/sign-in.jpg" alt="" class="sign-in img">
           <span>Giriş | Üyelik</span>
         </button>
-        <button class="basket">
+        <button class="basket" @click="toggleDropdown('cart', !menuStates.cart)">
           <i class="fas fa-shopping-basket"></i>
-          <img src="/static/images/basket.png" alt="" class="basket img">
-          <span>Sepet</span>
+          <img src="/static/images/sepet-icon.png" alt="" class="basket img">
         </button>
       </div>
     </div>
+
+    <!-- Sepet Dropdown Kartı -->
+    <CartDropdown 
+      :isOpen="menuStates.cart" 
+      @close="toggleDropdown('cart', false)" 
+    />
   </nav>
 </template>
 
 <script>
+import SearchDropdown from './SearchDropdown.vue';
+import CartDropdown from './CartDropdown.vue'; // Sepet kartı komponenti
 
 export default {
   name: "Navbar",
+  components: {
+    SearchDropdown,
+    CartDropdown, // Komponenti kaydediyoruz
+  },
   data() {
     return {
       menuStates: {
@@ -84,6 +114,7 @@ export default {
         kadin: false,
         cocuk: false,
         search: false,
+        cart: false, // Sepet kartı için durum
       },
     };
   },
@@ -195,8 +226,8 @@ export default {
 }
 
 .sign-in img, .basket img {
-  width: 18px;
-  height: 18px;
+  width: 25px;
+  height: 25px;
   object-fit: contain;
   margin-right: 3px;
 }
@@ -221,5 +252,40 @@ export default {
 /* Dropdown için stil */
 .menu-item:hover .Category {
   display: block; /* Hover ile açılır */
+}
+
+/* Sepet Dropdown Kartı */
+.cart-dropdown {
+  position: absolute;
+  top: 130px;
+  right: 25px;
+  width: 650px;
+  height: 350px;
+  padding: 15px;
+  background-color: white;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  z-index: 10;
+}
+
+.cart-header {
+  display: flex;
+  justify-content: space-between;
+  font-weight: bold;
+}
+
+.cart-body {
+  margin-top: 10px;
+}
+
+.cart-body p {
+  color: #666;
+}
+
+.close {
+  background: none;
+  border: none;
+  font-size: 16px;
+  cursor: pointer;
 }
 </style>

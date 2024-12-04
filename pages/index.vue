@@ -25,10 +25,10 @@
 </template>
 
 <script>
-import ComponentA from "~/components/ComponentA.vue";
-import ComponentC from "~/components/ComponentC.vue";
-import ComponentD from "~/components/ComponentD.vue";
-import ComponentE from "~/components/ComponentE.vue";
+import ComponentA from "~/components/Navbar.vue";
+import ComponentC from "~/components/SignInSignUp.vue";
+import ComponentD from "~/components/BlogNavbar.vue";
+import ComponentE from "~/components/CartDropdown.vue";
 import ProductCarousel from "~/components/ProductCarousel.vue";
 import ProductCard from "~/components/ProductCard.vue";
 import TheFooter from "~/components/TheFooter.vue";
@@ -49,10 +49,9 @@ export default {
     return {
       currentComponent: "",
       components: [
-        { name: "ComponentA", label: "Component 1-2" },
-        { name: "ComponentC", label: "Component 3" },
-        { name: "ComponentD", label: "Component 4" },
-        { name: "ComponentE", label: "Component 5" },
+        { name: "ComponentA", label: "Component 1-2-3" },
+        { name: "ComponentC", label: "Component 4" },
+        { name: "ComponentD", label: "Component 5" },
         { name: "Carousel", label: "Component 6" },
         { name: "ProductCard", label: "Component 7" },
         { name: "ProductCarousel", label: "Component 8-9" },
