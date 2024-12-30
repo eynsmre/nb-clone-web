@@ -60,8 +60,8 @@
 </template>
 
 <script>
-import News from './News.vue';
 import Brand from './Brand.vue';
+import News from './News.vue';
 
 export default {
   components: {

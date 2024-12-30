@@ -57,7 +57,7 @@
       </li>
       
       <li><a href="#" class="discount">İndirim</a></li>
-      <li><a href="#">Blog</a></li>
+      <li><nuxt-link to="/blog">Blog</nuxt-link></li>
     </ul>
 
     <div class="nav-actions">
@@ -76,11 +76,11 @@
       
       <!-- Kullanıcı ve Sepet Butonları -->
       <div class="user-actions">
-        <button class="sign-in">
+        <nuxt-link to="/login" class="sign-in">
           <i class="fas fa-user"></i>
           <img src="/static/images/sign-in.jpg" alt="" class="sign-in img">
           <span>Giriş | Üyelik</span>
-        </button>
+        </nuxt-link>
         <button class="basket" @click="toggleDropdown('cart', !menuStates.cart)">
           <i class="fas fa-shopping-basket"></i>
           <img src="/static/images/sepet-icon.png" alt="" class="basket img">
@@ -97,8 +97,8 @@
 </template>
 
 <script>
-import SearchDropdown from './SearchDropdown.vue';
 import CartDropdown from './CartDropdown.vue'; // Sepet kartı komponenti
+import SearchDropdown from './SearchDropdown.vue';
 
 export default {
   name: "Navbar",
