@@ -21,12 +21,12 @@
       <!-- Giriş Formu -->
       <div v-if="isLoginTab">
         <p style="color: #cf0a2c;">* Zorunlu alanları belirtir</p>
-        <form>
+        <form @submit.prevent="signIn">
           <div class="form-group">
-            <input type="email" id="email" placeholder="* Eposta" />
+            <input type="email" v-model="loginEmail" placeholder="* Eposta" />
           </div>
           <div class="form-group">
-            <input type="password" id="password" placeholder="* Parola" />
+            <input type="password" v-model="loginPassword" placeholder="* Parola" />
           </div>
           <div class="form-group checkbox-group">
             <input type="checkbox" id="remember" />
@@ -34,6 +34,7 @@
           </div>
           <br>
           <button type="submit" class="button">Giriş</button>
+           <p v-if="loginError" style="color: red;">{{ loginError }}</p>
         </form>
         <p>
           Hesabınız yok mu?
@@ -43,22 +44,22 @@
 
       <!-- Hesap Oluşturma Formu -->
       <div v-else>
-        <p style="color: #cf0a2c;">* Zorunlu alanları belirtir</p>
-        <form>
-          <div class="form-group">
-            <input type="text" id="firstname" placeholder="Adınız" />
+         <p style="color: #cf0a2c;">* Zorunlu alanları belirtir</p>
+        <form @submit.prevent="signUp">
+           <div class="form-group">
+            <input type="text" v-model="signUpFirstName" placeholder="Adınız" />
           </div>
           <div class="form-group">
-            <input type="text" id="lastname" placeholder="Soyadınız" />
+            <input type="text" v-model="signUpLastName" placeholder="Soyadınız" />
           </div>
           <div class="form-group">
-            <input type="email" id="email" placeholder="E-mail" />
+            <input type="email" v-model="signUpEmail" placeholder="E-mail" />
           </div>
           <div class="form-group">
-            <input type="text" id="phone" placeholder="Cep Telefonu" />
+            <input type="text" v-model="signUpPhone" placeholder="Cep Telefonu" />
           </div>
           <div class="form-group">
-            <input type="password" id="password" placeholder="Parola" />
+            <input type="password" v-model="signUpPassword" placeholder="Parola" />
             <ul>
               <li>Parola Gereksinimleri:</li>
               <br>
@@ -78,6 +79,7 @@
             <label for="terms">Kampanyalar ile ilgili eposta mesajlarını almak istiyorum ve <br>Sms ile özel indirimlerden haberdar olmak istiyorum, <br>Açık Rıza Metnini, okudum kabul ediyorum.</label>
           </div>
           <button type="submit" class="button">Hesap Oluştur</button>
+           <p v-if="signUpError" style="color: red;">{{ signUpError }}</p>
         </form>
         <p>
           Zaten hesabınız var mı?
@@ -88,14 +90,48 @@
   </div>
 </template>
 
-<script>
-export default {
-  data() {
-    return {
-      isLoginTab: true,
-    };
-  },
+<script setup>
+import { ref } from 'vue';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
+import { useNuxtApp } from '#app'
+
+const { $auth } = useNuxtApp();
+const isLoginTab = ref(true);
+
+// Sign In Form Data
+const loginEmail = ref('');
+const loginPassword = ref('');
+const loginError = ref(null);
+
+// Sign Up Form Data
+const signUpFirstName= ref('');
+const signUpLastName = ref('');
+const signUpEmail = ref('');
+const signUpPhone= ref('');
+const signUpPassword = ref('');
+const signUpError = ref(null);
+
+const signIn = async () => {
+  try {
+    loginError.value = null;
+     await signInWithEmailAndPassword($auth(), loginEmail.value, loginPassword.value);
+       // Redirect or handle successful sign-in
+    navigateTo('/');
+      } catch (error) {
+        loginError.value = error.message;
+      }
 };
+
+const signUp = async () => {
+    try {
+       signUpError.value = null;
+        await createUserWithEmailAndPassword($auth(), signUpEmail.value, signUpPassword.value);
+         // Redirect or handle successful sign-up
+        navigateTo('/');
+    } catch (error) {
+       signUpError.value = error.message;
+  }
+}
 </script>
 
 <style scoped>
@@ -153,7 +189,7 @@ ul {
 .checkbox-group {
   display: inline-flex;
   align-items: center;
-  gap: 10px; 
+  gap: 10px;
 }
 .button {
   background-color:#cf0a2c;
