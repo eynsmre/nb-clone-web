@@ -1,10 +1,10 @@
-// https://nuxt.com/docs/api/configuration/nuxt-config
+// nuxt.config.js
 export default defineNuxtConfig({
   compatibilityDate: '2024-11-01',
   devtools: { enabled: true },
   css: ['~/assets/css/main.css'],
   plugins: [
-    '~/plugins/firebase.js'
+    { src: '~/plugins/firebase.ts', mode: 'client' } // Ensure it's client-side only
   ],
   postcss: {
     plugins: {
@@ -12,4 +12,5 @@ export default defineNuxtConfig({
       autoprefixer: {},
     },
   },
+  ssr: false,
 })

@@ -1,7 +1,7 @@
 <template>
   <nav class="navbar">
     <div class="logo-container">
-      <img src="/static/images/logo.png" alt="Logo" class="logo">
+      <a href="/"> <img src="/static/images/logo.png" alt="Logo" class="logo"> </a>
     </div>
     <ul class="menu">
       <!-- Yeniler Menüsü -->
