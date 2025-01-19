@@ -8,13 +8,13 @@ import { getFirestore } from "firebase/firestore";
 
 // Define the Firebase configuration type
 interface FirebaseConfig {
-  apiKey: string;
-  authDomain: string;
-  projectId: string;
-  storageBucket: string;
-  messagingSenderId: string;
-  appId: string;
-  measurementId?: string; // Optional because measurementId is not always required
+    apiKey: string;
+    authDomain: string;
+    projectId: string;
+    storageBucket: string;
+    messagingSenderId: string;
+    appId: string;
+    measurementId?: string; // Optional because measurementId is not always required
 }
 
 // Your web app's Firebase configuration
@@ -33,14 +33,13 @@ const analytics: Analytics | null = typeof window !== "undefined" ? getAnalytics
 const auth = getAuth(app);
 const firestore = getFirestore(app);
 
-
 export default defineNuxtPlugin(() => {
     return {
         provide:{
             auth: () => auth,
             analytics: () => analytics,
             firestore: () => firestore,
-            }
+        }
     }
 })
-export {  analytics };
+export {  analytics, firestore };

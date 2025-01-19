@@ -5,12 +5,12 @@
                 <div class="flex-1 flex items-center gap-4 columns-6">
                     <div class="w-[75px] h-[75px] relative">
                         <!-- Doğru image kaynağını kullan -->
-                     <img 
-                    :src="product.image" 
-                    :alt="product.title"
-                    class="w-full h-full object-cover absolute inset-0"
-                    />
-                </div>
+                        <img
+                            :src="product.image"
+                            :alt="product.title"
+                            class="w-full h-full object-cover absolute inset-0"
+                        />
+                    </div>
                     <div>
                         <h3 class="text-sm font-semibold">{{ product.title }}</h3>
                         <p class="text-gray-600 text-sm">{{ product.category }}</p>
@@ -51,36 +51,51 @@
 <script setup lang="ts">
 import { useCart } from '~/composables/useCart';
 import { ref } from 'vue';
+
 const props = defineProps({
     product: {
         type: Object,
         required: true,
     },
 });
+
 const sizes = ["XS", "S", "M", "L", "XL", "XXL"];
 const emit = defineEmits(['close']);
 const addedToCart = ref(false);
 const { addToCart } = useCart();
 const selectedSize = ref('');
+
 const selectSize = (size: string) => {
     selectedSize.value = size;
-}
+};
+
 const closeModal = () => {
     emit("close");
 };
+
 const goBack = () => {
     emit('close');
 };
+
 const goToDetails = () => {
     window.location.href = props.product.detailsUrl;
 };
-const addToCartButton = () => {
-    addToCart(props.product, selectedSize.value);
-    addedToCart.value = true;
-    setTimeout(() => {
-        addedToCart.value = false;
-    }, 200);
+
+const addToCartButton = async () => {
+    if(!selectedSize.value) {
+         console.error("Beden seçimi yapılmadı!");
+         return;
+    }
+     try {
+           await addToCart(props.product, selectedSize.value);
+           addedToCart.value = true;
+           console.log("Ürün sepete eklendi");
+     } catch (error) {
+       console.error("Ürün sepete eklenirken hata oluştu:", error);
+    }
+
 };
+
 </script>
 <style scoped>
 .modal-container {

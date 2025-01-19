@@ -1,99 +1,107 @@
 <template>
-  <div v-if="isOpen" class="cart-dropdown" ref="cartDropdown" :style="{ maxHeight: dynamicMaxHeight }">
-      <div class="cart-content">
-          <div v-if="cartItems.length === 0" class="empty-cart">
-              <img src="/static/images/sepet-icon.png" alt="Sepet" class="cart-icon" />
-              <p class="cart-message">Sepetiniz henüz boş</p>
-              <button class="continue-shopping" @click="redirectToShopping">
-                  Alışverişe devam et
-              </button>
-          </div>
-          <div v-else class="filled-cart">
-              <div class="cart-header">
-                  <p class="cart-title">Sepet ({{ cartItems.length }})</p>
+  <div v-if="isOpen" class="cart-dropdown" :style="{ minHeight: cartDropdownMinHeight }" ref="cartDropdown">
+    <div class="cart-content" ref="cartContent">
+      <div v-if="cartItems.length === 0" class="empty-cart">
+        <img src="/static/images/sepet-icon.png" alt="Sepet" class="cart-icon" />
+        <p class="cart-message">Sepetiniz henüz boş</p>
+        <button class="continue-shopping" @click="redirectToShopping">
+          Alışverişe devam et
+        </button>
+      </div>
+      <div v-else class="filled-cart">
+        <div class="cart-header">
+          <p class="cart-title">Sepet ({{ cartItems.length }})</p>
+        </div>
+        <ul class="cart-items-list" ref="cartItemsList">
+          <li v-for="(item, index) in cartItems" :key="index" class="cart-item">
+            <div class="item-image-container">
+              <img :src="item.image" alt="Ürün Resmi" class="item-image" />
+            </div>
+            <div class="item-details">
+              <div class="item-title">
+                <span>{{ truncatedTitle(item.title) }}</span>
+                <span class="item-price">{{ item.price }}</span>
               </div>
-              <ul class="cart-items-list">
-                  <li v-for="(item, index) in cartItems" :key="index" class="cart-item">
-                      <div class="item-image-container">
-                          <img :src="item.image" alt="Ürün Resmi" class="item-image" />
-                      </div>
-                      <div class="item-details">
-                          <div class="item-title">
-                              <span>{{ truncatedTitle(item.title) }}</span>
-                              <span class="item-price">{{ item.price }}</span>
-                          </div>
-                          <div class="item-info-group">
-                              <div class="item-quantity">
-                                  <p>Adet: </p>
-                                  <div class="quantity-controls">
-                                      <button class="quantity-button" @click="decreaseQuantity(index)">-</button>
-                                      <input type="number" class="quantity-input" :value="item.quantity" readonly>
-                                      <button class="quantity-button" @click="increaseQuantity(index)">+</button>
-                                  </div>
-                              </div>
-                          </div>
-                          <div class="item-bottom-group">
-                              <p class="item-size" v-if="item.size">Beden: {{ item.size }} </p>
-                              <button class="remove-item" @click="removeItem(index)">Sil</button>
-                          </div>
-                      </div>
-                  </li>
-              </ul>
-          </div>
+              <div class="item-info-group">
+                <div class="item-quantity">
+                  <p>Adet: </p>
+                  <div class="quantity-controls">
+                    <button class="quantity-button" @click="decreaseQuantity(index)">-</button>
+                    <input type="number" class="quantity-input" :value="item.quantity" readonly>
+                    <button class="quantity-button" @click="increaseQuantity(index)">+</button>
+                  </div>
+                </div>
+              </div>
+              <div class="item-bottom-group">
+                <p class="item-size" v-if="item.size">Beden: {{ item.size }} </p>
+                <button class="remove-item" @click="removeItem(index)">Sil</button>
+              </div>
+            </div>
+          </li>
+        </ul>
       </div>
-      <div v-if="cartItems.length > 0" class="cart-footer">
-          <p class="total-price">Toplam Tutar: {{ totalPrice }}</p>
-          <div class="action-buttons">
-              <button class="continue-shopping" @click="redirectToShopping">
-                  Alışverişe Devam Et
-              </button>
-              <button class="view-cart" @click="viewCart">
-                  Sepeti Görüntüle
-              </button>
-          </div>
+    </div>
+    <div v-if="cartItems.length > 0" class="cart-footer">
+      <p class="total-price">Toplam Tutar: {{ totalPrice }}</p>
+      <div class="action-buttons">
+        <button class="continue-shopping" @click="redirectToShopping">
+          Alışverişe Devam Et
+        </button>
+        <button class="view-cart" @click="viewCart">
+          Sepeti Görüntüle
+        </button>
       </div>
+    </div>
   </div>
 </template>
+
 <script setup lang="ts">
 import { useCart } from '~/composables/useCart';
-import { type Ref, computed, ref, onMounted, onUnmounted } from 'vue';
+import { type Ref, computed, ref, onMounted, onUnmounted, watch } from 'vue';
 
 const props = defineProps({
   isOpen: {
-      type: Boolean,
-      required: true,
+    type: Boolean,
+    required: true,
   },
   initialCartItems: {
-      type: Array,
-      default: () => [],
+    type: Array,
+    default: () => [],
   },
 });
 
 const { cartItems, removeFromCart } = useCart();
 const cartDropdown = ref<HTMLElement | null>(null);
+const cartContent = ref<HTMLElement | null>(null);
+const cartItemsList = ref<HTMLElement | null>(null);
 const emit = defineEmits(["close"]);
+
+const cartDropdownMinHeight = ref('195px'); // Store the dynamic height here
 
 const handleClickOutside = (event: MouseEvent) => {
   if (cartDropdown.value && !cartDropdown.value.contains(event.target as Node)) {
-      emit("close");
+    emit("close");
   }
 };
-
 onMounted(() => {
   document.addEventListener("mousedown", handleClickOutside);
+
 });
 onUnmounted(() => {
   document.removeEventListener("mousedown", handleClickOutside);
 });
-
 const removeItem = (index: number) => {
   removeFromCart(index);
 };
 const increaseQuantity = (index: number) => {
   cartItems.value[index].quantity++;
+
 };
 const decreaseQuantity = (index: number) => {
-  if (cartItems.value[index].quantity > 1) cartItems.value[index].quantity--;
+  if (cartItems.value[index].quantity > 1) {
+        cartItems.value[index].quantity--;
+    }
+
 };
 const redirectToShopping = () => {
   emit("close");
@@ -104,38 +112,39 @@ const viewCart = () => {
 const totalPrice = computed(() => {
   let total = 0;
   cartItems.value.forEach((item) => {
-      const price = parseFloat(item.price.replace(/\./g, '').replace(',', '.').replace(' ₺', ''));
-      total += price * item.quantity;
+    const price = parseFloat(item.price.replace(/\./g, '').replace(',', '.').replace(' ₺', ''));
+    total += price * item.quantity;
   });
   return total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' ₺';
 });
 const truncatedTitle = (title: string) => {
   if (title.length > 18) {
-      return title.substring(0, 18) + "...";
+    return title.substring(0, 18) + "...";
   }
   return title;
 };
-const dynamicMaxHeight = computed(() => {
-  const itemCount = cartItems.value.length;
-  if (itemCount === 1) {
-      return "350px";
-  } else if (itemCount === 2) {
-      return "500px";
-  } else if (itemCount === 3) {
-      return "700px";
-  } else if (itemCount > 3) {
-      return "700px";
-  } else {
-      return "auto";
-  }
-});
+watch(
+    ()=> cartItems.value.length,
+    (newLength) =>{
+      if(newLength === 1){
+        cartDropdownMinHeight.value = '195px';
+      }else if(newLength === 2) {
+        cartDropdownMinHeight.value = '470px';
+      }else if (newLength >= 3){
+        cartDropdownMinHeight.value = '580px';
+      }
+    },
+    {immediate: true}
+);
 </script>
+
 <style scoped>
 .cart-dropdown {
   position: absolute;
-  top: 50px;
   right: 25px;
+  min-height: v-bind(cartDropdownMinHeight);
   width: 400px;
+
   background-color: white;
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
   border-radius: 8px;
@@ -143,27 +152,31 @@ const dynamicMaxHeight = computed(() => {
   border: 1px solid #ddd;
   display: flex;
   flex-direction: column;
+  /* min-height dinamik olarak ayarlanacak */
 }
+
 .cart-content {
   padding: 15px;
   flex: 1;
+  display: flex;
+  flex-direction: column;
   overflow-y: auto;
-  position: relative;
 }
+
 .cart-items-list {
   margin-bottom: 10px;
-  overflow-y: hidden;
+  overflow-y: auto;
+   /* max-height dinamik olarak ayarlanacak */
 }
+
 .cart-footer {
   display: flex;
   flex-direction: column;
   border-top: 1px solid #eee;
   padding: 10px 15px;
-  position: absolute;
-  bottom: 0;
-  width: 100%;
   background-color: white;
 }
+
 .cart-icon {
   width: 80px;
   height: 80px;
@@ -189,6 +202,8 @@ const dynamicMaxHeight = computed(() => {
 .filled-cart {
   display: flex;
   flex-direction: column;
+  flex: 1;
+  overflow-y: auto;
 }
 
 .cart-header {
@@ -207,6 +222,7 @@ const dynamicMaxHeight = computed(() => {
   color: #333;
   margin-left: 0;
 }
+
 .cart-item {
   display: flex;
   align-items: flex-start;
@@ -215,33 +231,40 @@ const dynamicMaxHeight = computed(() => {
   gap: 10px;
   position: relative;
 }
+
 .item-image-container {
   display: flex;
   align-items: center;
   flex-direction: column;
 }
+
 .item-image {
-  width: 80px;
+  width: 100px;
+  /* Ürün fotoğraflarını büyüt */
   height: auto;
   display: block;
 }
+
 .item-details {
   flex: 1;
   font-family: 'Montserrat', sans-serif;
   display: flex;
   flex-direction: column;
 }
-.item-info-group{
+
+.item-info-group {
   display: flex;
   align-items: center;
   justify-content: space-between;
   width: 100%;
 }
-.item-bottom-group{
+
+.item-bottom-group {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .item-title {
   font-size: 0.9rem;
   color: #333;
@@ -251,9 +274,11 @@ const dynamicMaxHeight = computed(() => {
   justify-content: space-between;
   align-items: center;
 }
-.item-title .item-price{
+
+.item-title .item-price {
   margin-bottom: 0;
 }
+
 .remove-item {
   background-color: transparent;
   color: #888;
@@ -272,21 +297,22 @@ const dynamicMaxHeight = computed(() => {
 .remove-item:hover {
   background-color: #eee;
 }
+
 .continue-shopping,
 .view-cart {
   background-color: #c60c30;
   color: white;
   border: none;
   border-radius: 4px;
-  padding: 10px 12px;
-  font-size: 12px;
+  padding: 12px 16px;
+  font-size: 14px;
   cursor: pointer;
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
   transition: background-color 0.3s ease;
-  margin-right: 5px;
   white-space: nowrap;
 }
+
 .continue-shopping:hover,
 .view-cart:hover {
   background-color: #a00a28;
@@ -295,16 +321,17 @@ const dynamicMaxHeight = computed(() => {
 .total-price {
   font-family: 'Montserrat', sans-serif;
   font-weight: 600;
-  font-size: 0.9rem;
+  font-size: 1rem;
   color: #333;
   margin-bottom: 10px;
-  text-align: right;
+  text-align: center;
   margin-right: 0;
 }
 
 .action-buttons {
   display: flex;
-  justify-content: flex-end;
+  justify-content: center;
+  gap: 10px;
 }
 
 .item-quantity {
@@ -314,7 +341,7 @@ const dynamicMaxHeight = computed(() => {
   margin-bottom: 2px;
 }
 
-.item-quantity > p {
+.item-quantity>p {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-size: 0.7rem;
@@ -355,7 +382,8 @@ const dynamicMaxHeight = computed(() => {
   color: #333;
   outline: none;
 }
-.item-size{
+
+.item-size {
   font-family: 'Montserrat', sans-serif;
   font-weight: 400;
   font-size: 0.7rem;

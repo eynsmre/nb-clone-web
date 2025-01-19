@@ -94,6 +94,8 @@
 import { ref } from 'vue';
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword } from 'firebase/auth'
 import { useNuxtApp } from '#app'
+import { useAuth } from '~/composables/useAuth';
+const { user } = useAuth();
 
 const { $auth } = useNuxtApp();
 const isLoginTab = ref(true);
@@ -114,12 +116,22 @@ const signUpError = ref(null);
 const signIn = async () => {
   try {
     loginError.value = null;
-     await signInWithEmailAndPassword($auth(), loginEmail.value, loginPassword.value);
-       // Redirect or handle successful sign-in
-    navigateTo('/');
-      } catch (error) {
-        loginError.value = error.message;
-      }
+    const userCredential = await signInWithEmailAndPassword($auth(), loginEmail.value, loginPassword.value);
+    
+    // Auth durumunun güncellenmesi için bekleyelim
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    
+    // Kullanıcının gerçekten giriş yaptığından emin olalım
+    if (userCredential.user) {
+      console.log("Giriş başarılı, kullanıcı ID:", userCredential.user.uid);
+      navigateTo('/');
+    } else {
+      throw new Error("Kullanıcı bilgisi alınamadı");
+    }
+  } catch (error) {
+    console.error("Giriş hatası:", error);
+    loginError.value = error.message;
+  }
 };
 
 const signUp = async () => {
