@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import type { Analytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth";
 import { defineNuxtPlugin } from '#app'
+import { getFirestore } from "firebase/firestore";
 
 // Define the Firebase configuration type
 interface FirebaseConfig {
@@ -18,27 +19,28 @@ interface FirebaseConfig {
 
 // Your web app's Firebase configuration
 const firebaseConfig: FirebaseConfig = {
-  apiKey: "AIzaSyDtUnFb1eGonvuAheC__DtgtGZO3mw7B_Y",
-  authDomain: "nb-clone-web.firebaseapp.com",
-  projectId: "nb-clone-web",
-  storageBucket: "nb-clone-web.firebasestorage.app",
-  messagingSenderId: "323275255336",
-  appId: "1:323275255336:web:d16172c2e4efcdf9f48f1d",
-  measurementId: "G-CHDREEKP8C",
+    apiKey: "AIzaSyDtUnFb1eGonvuAheC__DtgtGZO3mw7B_Y",
+    authDomain: "nb-clone-web.firebaseapp.com",
+    projectId: "nb-clone-web",
+    storageBucket: "nb-clone-web.firebasestorage.app",
+    messagingSenderId: "323275255336",
+    appId: "1:323275255336:web:d16172c2e4efcdf9f48f1d",
+    measurementId: "G-CHDREEKP8C",
 };
 
-// Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics: Analytics | null = typeof window !== "undefined" ? getAnalytics(app) : null;
 const auth = getAuth(app);
+const firestore = getFirestore(app);
 
 
 export default defineNuxtPlugin(() => {
-  return {
-    provide:{
-      auth: () => auth,
-      analytics: () => analytics
-      }
-  }
+    return {
+        provide:{
+            auth: () => auth,
+            analytics: () => analytics,
+            firestore: () => firestore,
+            }
+    }
 })
 export {  analytics };

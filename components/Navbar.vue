@@ -5,57 +5,59 @@
     </div>
     <ul class="menu">
       <!-- Yeniler Menüsü -->
-      <li 
-        class="menu-item category-item" 
-        @mouseover="toggleDropdown('yeniler', true)" 
+      <li
+        class="menu-item category-item"
+        @mouseover="toggleDropdown('yeniler', true)"
         @mouseleave="toggleDropdown('yeniler', false)"
       >
         <a href="#">Yeniler</a>
-        <Category 
+        <Category
           :isOpen="menuStates.yeniler"
           :class="{ 'is-visible': menuStates.yeniler }"
         />
       </li>
-      
+
       <!-- Erkek Menüsü -->
-      <li 
-        class="menu-item category-item" 
-        @mouseover="toggleDropdown('erkek', true)" 
+      <li
+        class="menu-item category-item"
+        @mouseover="toggleDropdown('erkek', true)"
         @mouseleave="toggleDropdown('erkek', false)"
       >
-        <a href="#">Erkek</a>
-        <Category 
+        <nuxt-link to="/erkek" class="sign-in">
+          <a href="#">Erkek</a>
+        </nuxt-link>
+        <Category
           :isOpen="menuStates.erkek"
           :class="{ 'is-visible': menuStates.erkek }"
         />
       </li>
 
       <!-- Kadın Menüsü -->
-      <li 
-        class="menu-item category-item" 
-        @mouseover="toggleDropdown('kadin', true)" 
+      <li
+        class="menu-item category-item"
+        @mouseover="toggleDropdown('kadin', true)"
         @mouseleave="toggleDropdown('kadin', false)"
       >
         <a href="#">Kadın</a>
-        <Category 
+        <Category
           :isOpen="menuStates.kadin"
           :class="{ 'is-visible': menuStates.kadin }"
         />
       </li>
 
       <!-- Çocuk Menüsü -->
-      <li 
-        class="menu-item category-item" 
-        @mouseover="toggleDropdown('cocuk', true)" 
+      <li
+        class="menu-item category-item"
+        @mouseover="toggleDropdown('cocuk', true)"
         @mouseleave="toggleDropdown('cocuk', false)"
       >
         <a href="#">Çocuk</a>
-        <Category 
+        <Category
           :isOpen="menuStates.cocuk"
           :class="{ 'is-visible': menuStates.cocuk }"
         />
       </li>
-      
+
       <li><a href="#" class="discount">İndirim</a></li>
       <li><nuxt-link to="/blog">Blog</nuxt-link></li>
     </ul>
@@ -73,7 +75,7 @@
         @close="toggleDropdown('search', false)"
         :class="{ 'is-visible': menuStates.search }"
       />
-      
+
       <!-- Kullanıcı ve Sepet Butonları -->
       <div class="user-actions">
         <nuxt-link to="/login" class="sign-in">
@@ -89,41 +91,29 @@
     </div>
 
     <!-- Sepet Dropdown Kartı -->
-    <CartDropdown 
-      :isOpen="menuStates.cart" 
-      @close="toggleDropdown('cart', false)" 
+    <CartDropdown
+      :isOpen="menuStates.cart"
+      @close="toggleDropdown('cart', false)"
     />
   </nav>
 </template>
 
-<script>
-import CartDropdown from './CartDropdown.vue'; // Sepet kartı komponenti
+<script setup lang="ts">
+import CartDropdown from './CartDropdown.vue';
 import SearchDropdown from './SearchDropdown.vue';
+import { ref } from 'vue';
 
-export default {
-  name: "Navbar",
-  components: {
-    SearchDropdown,
-    CartDropdown, // Komponenti kaydediyoruz
-  },
-  data() {
-    return {
-      menuStates: {
+const menuStates = ref<Record<string, boolean>>({
         yeniler: false,
         erkek: false,
         kadin: false,
         cocuk: false,
         search: false,
-        cart: false, // Sepet kartı için durum
-      },
+        cart: false,
+      });
+const toggleDropdown = (menuKey:string, state:boolean) => {
+      menuStates.value[menuKey] = state;
     };
-  },
-  methods: {
-    toggleDropdown(menuKey, state) {
-      this.menuStates[menuKey] = state;
-    },
-  },
-};
 </script>
 
 <style scoped>
@@ -133,6 +123,10 @@ export default {
   justify-content: space-between;
   padding: 5px 25px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  background-color: white; /*Ensures background doesn't dissapear when sticky*/
 }
 
 .logo-container {

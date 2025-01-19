@@ -6,6 +6,9 @@ export default defineNuxtConfig({
   plugins: [
     { src: '~/plugins/firebase.ts', mode: 'client' } // Ensure it's client-side only
   ],
+  modules: [
+    '@pinia/nuxt',
+  ],
   postcss: {
     plugins: {
       tailwindcss: {},
