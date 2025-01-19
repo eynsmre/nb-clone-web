@@ -1,365 +1,170 @@
 <template>
-    <div v-if="isOpen" class="cart-dropdown" ref="cartDropdown" :style="{ maxHeight: dynamicMaxHeight }">
-        <div class="cart-content">
-            <div v-if="cartItems.length === 0" class="empty-cart">
-                <img src="/static/images/sepet-icon.png" alt="Sepet" class="cart-icon" />
-                <p class="cart-message">Sepetiniz henüz boş</p>
-                <button class="continue-shopping" @click="redirectToShopping">
-                    Alışverişe devam et
-                </button>
-            </div>
-            <div v-else class="filled-cart">
-                <div class="cart-header">
-                    <p class="cart-title">Sepet ({{ cartItems.length }})</p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 p-6">
+      <div
+          v-for="(card, index) in visibleCards"
+          :key="index"
+          class="relative bg-white shadow-lg rounded-lg overflow-hidden group"
+      >
+          <div
+              class="relative"
+              @mouseover="changeImage(card)"
+              @mouseleave="resetImage(card)"
+          >
+              <img
+                  :src="card.currentImage"
+                  alt="Product Image"
+                  class="w-full h-full object-cover transition-transform duration-300"
+              />
+              <div
+                    class="absolute bottom-0 left-0 right-0 bg-gray-50 bg-opacity-50 text-white text-center py-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                >
+                    <span class="text-sm text-black font-semibold">Hızlı İncele</span>
                 </div>
-                <ul class="cart-items-list">
-                    <li v-for="(item, index) in cartItems" :key="index" class="cart-item">
-                        <div class="item-image-container">
-                            <img :src="item.image" alt="Ürün Resmi" class="item-image" />
-                        </div>
-                        <div class="item-details">
-                            <div class="item-title">
-                                <span>{{ truncatedTitle(item.title) }}</span>
-                                <span class="item-price">{{ item.price }}</span>
-                            </div>
-                            <div class="item-info-group">
-                                <div class="item-quantity">
-                                    <p>Adet: </p>
-                                    <div class="quantity-controls">
-                                        <button class="quantity-button" @click="decreaseQuantity(index)">-</button>
-                                        <input type="number" class="quantity-input" :value="item.quantity" readonly>
-                                        <button class="quantity-button" @click="increaseQuantity(index)">+</button>
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="item-bottom-group">
-                                <p class="item-size" v-if="item.size">Beden: {{ item.size }} </p>
-                                <button class="remove-item" @click="removeItem(index)">Sil</button>
-                            </div>
-                        </div>
-                    </li>
-                </ul>
+
+                <button
+                    class="absolute top-2 right-2 bg-white p-1.5 rounded-full shadow-lg group-hover:opacity-100 opacity-0 transition"
+                    @click="openViewModal(card)"
+                >
+                    <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke-width="1.5"
+                        stroke="currentColor"
+                        class="w-5 h-5 text-gray-600"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            d="M20.84 4.61a5.5 5.5 0 00-7.78 0l-.6.6-.59-.59a5.5 5.5 0 00-7.78 7.78l8.38 8.39 8.39-8.38a5.5 5.5 0 000-7.78z"
+                        />
+                    </svg>
+                </button>
             </div>
-        </div>
-        <div v-if="cartItems.length > 0" class="cart-footer">
-            <p class="total-price">Toplam Tutar: {{ totalPrice }}</p>
-            <div class="action-buttons">
-                <button class="continue-shopping" @click="redirectToShopping">
-                    Alışverişe Devam Et
-                </button>
-                <button class="view-cart" @click="viewCart">
-                    Sepeti Görüntüle
-                </button>
+
+            <div class="flex space-x-2 mt-2">
+                <img
+                    v-for="(thumbnail, idx) in card.thumbnails"
+                    :key="idx"
+                    :src="thumbnail"
+                    alt="Thumbnail"
+                    class="w-10 h-10 object-cover border border-gray-300 rounded cursor-pointer hover:border-gray-500"
+                    @mouseover="card.currentImage = thumbnail"
+                   @mouseleave="resetImage(card)"
+                />
+            </div>
+
+            <div class="p-4">
+                <h2 class="text-lg font-semibold text-gray-800">{{ card.title }}</h2>
+                <p class="text-sm text-gray-500 mt-2">{{ card.category }}</p>
+                <p class="text-sm text-gray-500">{{ card.type }}</p>
+                <p class="text-lg font-bold text-gray-800 mt-4">{{ card.price }}</p>
             </div>
         </div>
     </div>
-  </template>
-  <script setup lang="ts">
-  import { useCart } from '~/composables/useCart';
-  import { type Ref, computed, ref, onMounted, onUnmounted } from 'vue';
-  
-  const props = defineProps({
-    isOpen: {
-        type: Boolean,
-        required: true,
+
+    <View v-if="showComponent && selectedProduct" :product="selectedProduct" @close="showComponent = false" />
+</template>
+<script setup lang="ts">
+import { ref, onMounted, onUnmounted, type Ref } from 'vue';
+import View from './View.vue';
+interface ProductCardProps {
+    currentImage: string;
+    originalImage: string;
+    hoverImage: string;
+    thumbnails: string[];
+    title: string;
+    category: string;
+    type: string;
+    price: string;
+    detailsUrl: string;
+    id: number;
+}
+const originalCards = [
+    {
+        id: 1,
+        currentImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBU998TI_1.jpg",
+        originalImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBU998TI_1.jpg",
+        hoverImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBU998TI_2.jpg",
+        thumbnails: ["https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBU998TI_1.jpg"],
+        title: "New Balance 998 Beyaz Unisex Ayakkabı",
+        category: "Ayakkabı",
+        type: "Ayakkabı",
+        price: "9.990,00 ₺",
+        detailsUrl: '/product-details/998-beyaz'
     },
-    initialCartItems: {
-        type: Array,
-        default: () => [],
+    {
+        id: 2,
+        currentImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXU_1.jpg",
+        originalImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXU_1.jpg",
+        hoverImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXU_2.jpg",
+        thumbnails: ["https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXU_1.jpg", "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXT_1.jpg"],
+        title: "New Balance 2002RX Gore Tex ® Haki Unisex",
+        category: "Günlük Giyim",
+        type: "Günlük Giyim",
+        price: "9.990,00 ₺",
+         detailsUrl: '/product-details/2002rx-haki'
     },
-  });
-  
-  const { cartItems, removeFromCart } = useCart(); // <-- useCart'ı burada çağır
-  const cartDropdown = ref<HTMLElement | null>(null);
-  const emit = defineEmits(["close"]);
-  
-  const handleClickOutside = (event: MouseEvent) => {
-    if (cartDropdown.value && !cartDropdown.value.contains(event.target as Node)) {
-        emit("close");
+    {
+        id: 3,
+         
+        currentImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXT_1.jpg",
+         originalImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXT_1.jpg",
+        hoverImage: "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXT_2.jpg",
+        thumbnails: ["https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXT_1.jpg", "https://img1-newbalance.mncdn.com/mnpadding/480/480/FFFFFF/newbalance/products/NBM2002RXU_1.jpg"],
+        title: "New Balance 2002RX Gore Tex ® Siyah Unisex",
+        category: "Günlük Giyim",
+        type: "Günlük Giyim",
+        price: "9.990,00 ₺",
+        detailsUrl: '/product-details/2002rx-siyah'
+    },
+];
+const visibleCards = ref<ProductCardProps[]>([]);
+const cardsPerPage = ref(9);
+const showComponent = ref(false);
+const selectedProduct = ref<ProductCardProps | null>(null);
+const isLoading = ref(false);
+onMounted(() => {
+    loadMoreCards();
+    window.addEventListener('scroll', handleScroll);
+});
+onUnmounted(() => {
+    window.removeEventListener('scroll', handleScroll);
+});
+const loadMoreCards = () => {
+    isLoading.value = true;
+    setTimeout(() => {
+        const startIndex = visibleCards.value.length;
+        const endIndex = startIndex + cardsPerPage.value;
+        const newCards: ProductCardProps[] = [];
+        for (let i = startIndex; i < endIndex; i++) {
+            newCards.push({ ...originalCards[i % originalCards.length] });
+        }
+        visibleCards.value.push(...newCards);
+        isLoading.value = false;
+    }, 300)
+};
+const handleScroll = () => {
+    if (isLoading.value) return;
+    
+    const windowHeight = window.innerHeight;
+    const documentHeight = document.documentElement.scrollHeight;
+    const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+    
+    if (windowHeight + scrollTop >= documentHeight - 100) {
+        loadMoreCards();
     }
-  };
-  
-  onMounted(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-  });
-  onUnmounted(() => {
-    document.removeEventListener("mousedown", handleClickOutside);
-  });
-  
-  const removeItem = (index: number) => {
-    removeFromCart(index);
-  };
-  const increaseQuantity = (index: number) => {
-    cartItems.value[index].quantity++;
-  };
-  const decreaseQuantity = (index: number) => {
-    if (cartItems.value[index].quantity > 1) cartItems.value[index].quantity--;
-  };
-  const redirectToShopping = () => {
-    emit("close");
-  };
-  const viewCart = () => {
-    // Sepeti görüntüle butonuna tıklandığında yapılacak işlemleri burada tanımlayabilirsiniz
-  };
-  const totalPrice = computed(() => {
-    let total = 0;
-    cartItems.value.forEach((item) => {
-        const price = parseFloat(item.price.replace(/\./g, '').replace(',', '.').replace(' ₺', ''));
-        total += price * item.quantity;
-    });
-    return total.toFixed(2).replace('.', ',').replace(/\B(?=(\d{3})+(?!\d))/g, ".") + ' ₺';
-  });
-  const truncatedTitle = (title: string) => {
-    if (title.length > 18) {
-        return title.substring(0, 18) + "...";
-    }
-    return title;
-  };
-  const dynamicMaxHeight = computed(() => {
-    const itemCount = cartItems.value.length;
-    if (itemCount === 1) {
-        return "350px";
-    } else if (itemCount === 2) {
-        return "500px";
-    } else if (itemCount === 3) {
-        return "700px";
-    } else if (itemCount > 3) {
-        return "700px";
-    } else {
-        return "auto";
-    }
-  });
-  </script>
-  <style scoped>
-  .cart-dropdown {
-    position: absolute;
-    top: 50px;
-    right: 25px;
-    width: 400px;
-    background-color: white;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    border-radius: 8px;
-    z-index: 10;
-    border: 1px solid #ddd;
-    display: flex;
-    flex-direction: column;
-  }
-  .cart-content {
-    padding: 15px;
-    flex: 1;
-    overflow-y: auto;
-    position: relative;
-  }
-  .cart-items-list {
-    margin-bottom: 10px;
-    overflow-y: hidden;
-  }
-  .cart-footer {
-    display: flex;
-    flex-direction: column;
-    border-top: 1px solid #eee;
-    padding: 10px 15px;
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    background-color: white;
-  }
-  .cart-icon {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 10px;
-  }
-  
-  .cart-message {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 14px;
-    color: #333;
-    margin-bottom: 15px;
-    text-align: center;
-  }
-  
-  .empty-cart {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-  }
-  
-  .filled-cart {
-    display: flex;
-    flex-direction: column;
-  }
-  
-  .cart-header {
-    display: flex;
-    justify-content: flex-start;
-    align-items: center;
-    padding-bottom: 10px;
-    border-bottom: 1px solid #eee;
-    margin-bottom: 10px;
-  }
-  
-  .cart-title {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 1rem;
-    color: #333;
-    margin-left: 0;
-  }
-  .cart-item {
-    display: flex;
-    align-items: flex-start;
-    padding: 10px 0;
-    border-bottom: 1px solid #eee;
-    gap: 10px;
-    position: relative;
-  }
-  .item-image-container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
-  }
-  .item-image {
-    width: 80px;
-    height: auto;
-    display: block;
-  }
-  .item-details {
-    flex: 1;
-    font-family: 'Montserrat', sans-serif;
-    display: flex;
-    flex-direction: column;
-  }
-  .item-info-group{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    width: 100%;
-  }
-  .item-bottom-group{
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .item-title {
-    font-size: 0.9rem;
-    color: #333;
-    font-weight: 600;
-    margin-bottom: 2px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-  .item-title .item-price{
-    margin-bottom: 0;
-  }
-  .remove-item {
-    background-color: transparent;
-    color: #888;
-    border: none;
-    border-radius: 4px;
-    padding: 4px 8px;
-    font-size: 11px;
-    cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    position: absolute;
-    bottom: 5px;
-    right: 5px;
-  }
-  
-  .remove-item:hover {
-    background-color: #eee;
-  }
-  .continue-shopping,
-  .view-cart {
-    background-color: #c60c30;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    padding: 10px 12px;
-    font-size: 12px;
-    cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    transition: background-color 0.3s ease;
-    margin-right: 5px;
-    white-space: nowrap;
-  }
-  .continue-shopping:hover,
-  .view-cart:hover {
-    background-color: #a00a28;
-  }
-  
-  .total-price {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 0.9rem;
-    color: #333;
-    margin-bottom: 10px;
-    text-align: right;
-    margin-right: 0;
-  }
-  
-  .action-buttons {
-    display: flex;
-    justify-content: flex-end;
-  }
-  
-  .item-quantity {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-bottom: 2px;
-  }
-  
-  .item-quantity > p {
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400;
-    font-size: 0.7rem;
-    color: #333;
-  }
-  
-  .quantity-controls {
-    display: flex;
-    align-items: center;
-    gap: 3px;
-  }
-  
-  .quantity-button {
-    background-color: #eee;
-    color: #333;
-    border: none;
-    border-radius: 4px;
-    padding: 2px 6px;
-    font-size: 12px;
-    cursor: pointer;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-  }
-  
-  .quantity-button:hover {
-    background-color: #ddd;
-  }
-  
-  .quantity-input {
-    width: 30px;
-    text-align: center;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    padding: 2px;
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 600;
-    font-size: 12px;
-    color: #333;
-    outline: none;
-  }
-  .item-size{
-    font-family: 'Montserrat', sans-serif;
-    font-weight: 400;
-    font-size: 0.7rem;
-    color: #333;
-    margin-bottom: 2px;
-  }
-  </style>
+};
+const changeImage = (card: ProductCardProps) => {
+    card.currentImage = card.hoverImage;
+};
+const resetImage = (card: ProductCardProps) => {
+     card.currentImage = card.originalImage;
+};
+const openViewModal = (card: ProductCardProps) => {
+    selectedProduct.value = card;
+    showComponent.value = true;
+}
+</script>
+<style scoped>
+</style>
